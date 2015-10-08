@@ -1,0 +1,15 @@
+{
+	"development": {
+		"host": "localhost",
+		"port": 8587,
+		"baseURL": "http://localhost:8587",
+		"apiServer": "http://localhost:5050"
+	},
+
+	"production": {
+		"host": "localhost",
+		"port": 8587,
+		"baseURL": "http://pyCloud.cloudapp.net",
+		"apiServer": "http://localhost:5050"
+	}
+}

@@ -1,0 +1,24 @@
+extends ../layout.jade
+block main
+	div.login
+		block content
+			div.center
+				form(class="form-login box", action="/users/login", method="POST")
+					ul.noul
+						li
+							h3.divider Login
+							input.input-block-level(type="email", name="email", placeholder="Email")
+						li
+							input.input-block-level(type="password", name="password", placeholder="Password")
+						li
+							span.small
+								input(type="checkbox", value="remember-me", id="remember_me")
+								label(for="remember_me") Remember me
+
+							button(class="btn flt-right",type="submit") Sign in
+
+block post_wrap
+	script.
+		console.log("Do like this if you want to do inline js on this particular page");
+		console.log("Or do as below to include js files only on this page")
+	script(src="#{staticURL}/scripts/modules/login.js")

@@ -1,0 +1,24 @@
+doctype html
+html
+	head
+		meta(charset="utf-8")
+		meta(http-equiv="X-UA-Compatible" content="IE=edge")
+		meta(name="description" content="#{metaDescription || 'PyCloud!'}")
+		meta(name="robots" content="index, follow")
+		meta(name="viewport" content="width=device-width, initial-scale=1")
+		title #{pageTitle}
+		link(rel="stylesheet", href="#{staticURL}/styles/main.min.css")
+	body
+		block scripts
+		div#wrap
+			include header
+
+			block pre_main
+			div#main
+				block main
+			block post_main
+
+			include footer
+
+		script(src="#{staticURL}/scripts/main.min.js")
+		block post_wrap

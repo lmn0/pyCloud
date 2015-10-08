@@ -1,0 +1,23 @@
+extends ../layout.jade
+
+block pre_main
+	div#banner
+		div.content
+			h2
+				| Get started with the pyCloud!
+				h4 Start coding right away!
+
+block main
+	div.home
+		| CMPE 273 Project work. Hope you have fun not working on your system without python! all plugins could easily be included by just using button clicks.
+
+block post_wrap
+	script.
+		Jyotisham.addWinResize(function() {
+			var j = Jyotisham;
+			winH = j.dom.win.outerHeight(false);
+			docH = j.dom.doc.outerHeight(false);
+			winH = (winH > docH)? docH : winH;
+
+			$("#banner").css("height", winH - j.dom.header.outerHeight(false));
+		});
