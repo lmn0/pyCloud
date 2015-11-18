@@ -1,0 +1,12 @@
+extends ../layout.jade
+block main
+	div.editor
+		block content
+			div.center
+				form(action="/editor/run", method="POST")
+					ul.noul
+						li
+							input.input-block-level(type="textbox", name="script", placeholder="Script")
+						li
+							button(class="btn flt-right",type="submit") Run
+block post_wrap

@@ -50,7 +50,7 @@ var App = {
 		/* Application routes */
 		app.use("/", require("./modules/pages/pages.js"));
 		app.use("/users", require("./modules/authentication/authentication.js"));
-    
+    	app.use("/editor", require("./modules/editor/editor.js"));
 		// ====
 	},
 
