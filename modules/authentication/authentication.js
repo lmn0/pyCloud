@@ -14,7 +14,7 @@ var Authentication = {
   login: function(req, res, r_type, cb) {
     switch(r_type) {
       case "PUT":
-        Api.login(req.body, res, cb);
+        Api.login(req, res, cb);
         break;
 
       default:

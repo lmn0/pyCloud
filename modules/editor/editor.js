@@ -10,17 +10,34 @@ var express = require('express'),
     r = require("../../lib/request");
 // ===
 
+
+//GET Req
+router.get(['/', '/:action'], function(req, res, next) {
+  var action = req.params.action;
+  console.log(req.ip);
+  switch(action) {
+
+    default:
+      res.status(200).render("editor/editor.jade", {
+        pageTitle: "pyCloud! - Editor",
+        showRegister: false
+      });
+  }
+  return next();
+});
+// ===
+
+//POST Req
 router.post(['/', '/:action'], function(req, res, next) {
   var action = req.params.action;
 
-  var Api = {
-  run: function(params, res, cb) {
-  			
-  			
-		}
-	}
-
-
+  switch(action){
+  	case "run":
+  		
+  		res.status(200).json({"status":"Executed"});
+  		break;
+  }
+  return next();
 });
 // ====
 
