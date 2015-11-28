@@ -39,7 +39,12 @@ router.get(['/', '/:action'], function(req, res, next) {
         showRegister: true
       });
       break;
-
+    case "notfound":
+    res.status(200).render("authentication/notfound.jade", {
+        pageTitle: "pyCloud! - Login",
+        showRegister: true
+      });
+      break;
     default:
       res.status(200).render("authentication/login.jade", {
         pageTitle: "pyCloud! - Login",

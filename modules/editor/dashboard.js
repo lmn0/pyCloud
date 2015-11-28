@@ -16,9 +16,15 @@ router.get(['/', '/:action'], function(req, res, next) {
   var action = req.params.action;
   console.log(req.ip);
   switch(action) {
+    case "dashboard":
+      res.status(200).render("authentication/dashboard.jade", {
+        pageTitle: "pyCloud! - Login",
+        showRegister: true
+      });
+      break;
 
     default:
-      res.status(200).render("editor/editor.jade", {
+      res.render("editor/dashboard.jade", {
         pageTitle: "pyCloud! - Editor",
         showRegister: false
       });
