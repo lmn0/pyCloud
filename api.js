@@ -72,14 +72,13 @@ MongoClient.connect(url, function (err, db) {
 createaccount:function(req,res,cb){
 
     var findUser = function(db, callback) {
-   var cursor =db.collection('users').find( { "username": req.params.email,"password":req.params.password} );
-   cursor.each(function(err, doc) {
+   var cursor =db.collection('users').findOne( { "username": req.params.email,"password":req.params.password},function(err, doc) {
       assert.equal(err, null);
       if (doc != null) {
-         console.dir(doc.rip);
-      } else {
          res.redirect('alreadyexist');
          res.end();
+      } else {
+         
       }
    });
 };

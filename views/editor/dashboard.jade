@@ -3,7 +3,18 @@ block main
 	div.editor
 		block content
 			div.center
-				ul.noul
-					li
-						h3.divider Workspace Dashboard
+				form(action="/editor/newworkspace", method="POST")
+					ul.noul
+						li
+							h3.divider Workspace Dashboard
+							.ui.cards
+								.card
+									.content
+										.header Create Workspace
+										.description
+											input.input-block-level(name="workspacename", placeholder="Workspace Name") 
+									button(type="submit" id="1" name="1") +
+								
+
 block post_wrap
+	
