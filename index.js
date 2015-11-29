@@ -2,6 +2,9 @@
 var express = require("express"),
     bodyParser = require("body-parser"),
 	morgan = require("morgan");
+var session = require('express-session');
+var cookieParser = require('cookie-parser');
+
 
 // ===
 
@@ -10,6 +13,13 @@ var Utilities = require("./lib/utilities.js");
 // ===
 
 var app = express();
+app.use(cookieParser('my 114 o2o'));
+app.use(session({
+  maxAge : 1000*60*60*24 ,
+  cookie : {
+    maxAge : 1000*60*60*24 // expire the session(-cookie) after
+  }
+}));
 
 
 var App = {

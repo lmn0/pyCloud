@@ -3,10 +3,10 @@ block main
 	div.login
 		block content
 			div.center
-				form(class="form-login box", action="/users/login", method="POST")
+				form(class="form-login box", action="/users/createaccount", method="POST")
 					ul.noul
 						li
-							h3.divider Login
+							h3.divider Create Account
 							input.input-block-level(type="email", name="email", placeholder="Email")
 						li
 							input.input-block-level(type="password", name="password", placeholder="Password")
@@ -15,10 +15,7 @@ block main
 								input(type="checkbox", value="remember-me", id="remember_me")
 								label(for="remember_me") Remember me
 
-							button(class="btn flt-right",type="submit") Sign in
-						li
-							|	Create an account by clicking 
-							a(href='/users/createaccount') here
+							button(class="btn flt-right",type="submit") Create
 
 block post_wrap
 	script.

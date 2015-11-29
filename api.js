@@ -13,14 +13,26 @@ var assert = require('assert');
 var Api = {
   login: function(req, res, cb) {
 
+  var changeSession=function(db, callback) {
+   db.collection('users').updateOne(
+      { "email" : req.body.email,"password":req.body.password },
+      {
+        $set: { "sid": req.sessionID }
+      }, function(err, results) {
+      console.log(results);
+      res.redirect('/editor/dashboard');
+      res.end();
+   });
+};
+
   var findUser = function(db, callback) {
     console.log(req.body.email);
+    console.log(req.body.password);
    var cursor =db.collection('users').findOne( { "email": req.body.email,"password":req.body.password} ,function(err, doc) {
       assert.equal(err, null);
       if (doc != null) {
         console.log(doc);
-         res.redirect('/editor/dashboard');
-         res.end();
+         changeSession(db,function(){db.close();});
       } else {
         console.log(doc);
          res.redirect('notfound');
@@ -71,15 +83,28 @@ MongoClient.connect(url, function (err, db) {
 
 createaccount:function(req,res,cb){
 
-    var findUser = function(db, callback) {
-   var cursor =db.collection('users').findOne( { "username": req.params.email,"password":req.params.password},function(err, doc) {
+    var addUser = function(db, callback) {
+   var cursor =db.collection('users').insertOne( { "email": req.body.email,"password":req.body.password,"sid":req.sessionID},function(err, result) {
+      assert.equal(err, null);
+      console.log(result);
+      res.redirect('/editor/dashboard');
+      res.end();
+   });
+};
+
+var findUser = function(db, callback) {
+    console.log(req.body.email);
+   var cursor =db.collection('users').findOne( { "email": req.body.email} ,function(err, doc) {
       assert.equal(err, null);
       if (doc != null) {
-         res.redirect('alreadyexist');
+        console.log(doc);
+         res.redirect('/users/alreadyexist');
          res.end();
       } else {
-         
+        console.log(doc);
+        addUser(db,function(){db.close();})
       }
+      //res.redirect('dashboard');
    });
 };
 
@@ -92,7 +117,6 @@ createaccount:function(req,res,cb){
 
     // Get the documents collection
     findUser(db,function(){db.close();});
-
   }
   
 });

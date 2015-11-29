@@ -6,14 +6,26 @@ block main
 				form(action="/editor/newworkspace", method="POST")
 					ul.noul
 						li
-							h3.divider Workspace Dashboard
+							h3.divider Dashboard
 							.ui.cards
+									.card
+										.content
+											.header Workspace
+											.description
+												input.input-block-level(name="workspacename", placeholder=i)  
+										button(type="submit" id=i name="1") Start
 								.card
-									.content
-										.header Create Workspace
-										.description
-											input.input-block-level(name="workspacename", placeholder="Workspace Name") 
-									button(type="submit" id="1" name="1") +
+										.content
+											.header Create Workspace
+											.description
+												input.input-block-level(name="workspacename", placeholder="Workspace Name")  
+										button(type="submit" id=i name="1") + 
+						-	var values= [1,2,3]
+						each val in values
+							li= val
+								
+
+
 								
 
 block post_wrap

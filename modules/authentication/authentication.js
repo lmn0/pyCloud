@@ -26,6 +26,22 @@ var Authentication = {
             });
         break;
     }
+  },
+  createaccount: function(req, res, r_type, cb) {
+    switch(r_type) {
+      case "PUT":
+        Api.createaccount(req, res, cb);
+        break;
+
+      default:
+        res.status(400)
+           .render("error", {
+              pageTitle: "pyCloud! - Error",
+              errCode: 400,
+              errMsg: "Invalid request"
+            });
+        break;
+    }
   }
 };
 
@@ -41,6 +57,18 @@ router.get(['/', '/:action'], function(req, res, next) {
       break;
     case "notfound":
     res.status(200).render("authentication/notfound.jade", {
+        pageTitle: "pyCloud! - Login",
+        showRegister: true
+      });
+      break;
+    case "createaccount":
+    res.status(200).render("authentication/createaccount.jade", {
+        pageTitle: "pyCloud! - Login",
+        showRegister: true
+      });
+      break;
+    case "alreadyexist":
+    res.status(200).render("authentication/alreadyexist.jade", {
         pageTitle: "pyCloud! - Login",
         showRegister: true
       });
