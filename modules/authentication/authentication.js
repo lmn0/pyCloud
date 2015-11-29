@@ -8,6 +8,12 @@ var express = require('express'),
     router = express.Router(),
     Api = require("../../api"),
     r = require("../../lib/request");
+var mongodb = require('mongodb');
+//We need to work with "MongoClient" interface in order to connect to a mongodb server.
+var MongoClient = mongodb.MongoClient;
+// Connection URL. This is where your mongodb server is running.
+var url = 'mongodb://localhost:27017/pyCloud';
+var assert = require('assert');
 // ===
 
 var Authentication = {
@@ -52,34 +58,71 @@ router.get(['/', '/:action'], function(req, res, next) {
     case "register":
       res.status(200).render("authentication/login.jade", {
         pageTitle: "pyCloud! - Login",
-        showRegister: true
+        showRegister: true,
+        showlogin:true
       });
       break;
     case "notfound":
     res.status(200).render("authentication/notfound.jade", {
         pageTitle: "pyCloud! - Login",
-        showRegister: true
+        showRegister: true,
+        showlogin:true
       });
       break;
     case "createaccount":
     res.status(200).render("authentication/createaccount.jade", {
         pageTitle: "pyCloud! - Login",
-        showRegister: true
+        showRegister: true,
+        showlogin:true
       });
       break;
     case "alreadyexist":
     res.status(200).render("authentication/alreadyexist.jade", {
         pageTitle: "pyCloud! - Login",
-        showRegister: true
+        showRegister: true,
+        showlogin:true
       });
+      break;
+    case "logout":
+      var changeSession=function(db, callback) {
+   db.collection('users').updateOne(
+      { "sid":req.sessionID },
+      {
+        $set: { "sid": "" }
+      }, function(err, results) {
+      console.log("results");
+      res.status(200).render("authentication/login.jade", {
+        pageTitle: "pyCloud! - Login",
+        showRegister: true,
+        showlogin:true
+      });
+   });
+};
+    
+    //WRITE THE LOGIN LOGIC HERE !
+
+// Use connect method to connect to the Server
+MongoClient.connect(url, function (err, db) {
+  if (err) {
+    console.log('Unable to connect to the mongoDB server. Error:', err);
+  } else {
+    //HURRAY!! We are connected. :)
+    console.log('Connection established to', url);
+
+    // Get the documents collection
+    changeSession(db,function(){db.close();});
+
+  }
+  
+});
       break;
     default:
       res.status(200).render("authentication/login.jade", {
         pageTitle: "pyCloud! - Login",
-        showRegister: false
+        showRegister: false,
+        showlogin:true
       });
   }
-  return next();
 });
 // ====
 

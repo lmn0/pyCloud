@@ -21,17 +21,21 @@ var pagesURL = path.join(__dirname, "../../views", "pages"),
     staticPages = require("./staticpages.js");
 
 router.get(['/', '/:pageID'], function(req, res, next) {
+  console.log(req.params);
   var pageID = req.params.pageID,
       templatePath = null,
       pageTemplate = null,
       f = null,
       html = null,
       show404 = false;
+  var showlogin=true;
 
-  if(!pageID) {
+  if(!pageID || pageID=="nologin") {
+    if(pageID=="nologin")
+      showlogin=false;
     pageID = "home";
   }
-
+  console.log(pageID);
   // check if custom jade file exists for this page
   try {
     pageTemplate = pageID + ".jade";
@@ -56,10 +60,21 @@ router.get(['/', '/:pageID'], function(req, res, next) {
     });
   } else {
     templatePath = path.join(pagesURL, pageTemplate);
+    console.log("in here");
+    //console.log(req);
+    if(req.session.lastPage=="/editor/dashboard")
     res.status(200)
        .render(templatePath, {
           html: html,
-          pageTitle: "pyCloud!"
+          pageTitle: "pyCloud!",
+          showlogin:showlogin
+    });
+    else
+      res.status(200)
+       .render(templatePath, {
+          html: html,
+          pageTitle: "pyCloud!",
+          showlogin:showlogin
     });
   }
 

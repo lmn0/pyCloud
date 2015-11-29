@@ -20,25 +20,21 @@ var assert = require('assert');
 //GET Req
 router.get(['/', '/:action'], function(req, res, next) {
   var action = req.params.action;
+
   console.log(req.ip);
   switch(action) {
     case "dashboard":
   var wspaces=[];
-
     var findWorkspaces=function(db,userdoc,callback){
         var found=0;
         console.log(userdoc._id);
-        var cursor =db.collection('workspace').find({ "uid":userdoc._id}).toArray(function(err,result){
-          //wspaces=result;
-          
-        for(var i=0;i<result.length;i++)
-            {
-              wspaces[i]=result[i].workspace;
-            }
+        var cursor =db.collection('workspace').find({ "uid":userdoc._id},{_id:0,"uid":false}).toArray(function(err,result){
+          console.log(result);
           res.status(200).render("editor/dashboard.jade", {
-          workspaces: wspaces,
+          workspaces: result,
           pageTitle: "pyCloud! - Dashboard",
-          showRegister: true
+          showRegister: true,
+          showlogin:false
         });
         }); 
       } 
@@ -80,19 +76,28 @@ router.get(['/', '/:action'], function(req, res, next) {
       break;
     case "workspacepresent":
       res.status(200).render("editor/workspacepresent.jade", {
-        pageTitle: "pyCloud! - Login",
-        showRegister: true
+        pageTitle: "pyCloud! - Dashboard",
+        showRegister: true,
+        showlogin:false
       });
       break;
-
+    case "logout":
+      res.status(200).render("authentication/alreadyexist.jade", {
+        pageTitle: "pyCloud! - Login",
+        showRegister: true,
+        showlogin:true
+      });
+      break;
     default:
       res.render("editor/dashboard.jade", {
         pageTitle: "pyCloud! - Dashboard",
-        showRegister: false
+        showRegister: false,
+        showlogin:false
       });
   }
 });
 // ===
+
 
 //POST Req
 router.post(['/', '/:action'], function(req, res, next) {
@@ -100,9 +105,21 @@ router.post(['/', '/:action'], function(req, res, next) {
 
   switch(action){
     case "newworkspace":
-    
+    console.log(req.body.butt);
+    var startcontainer = function(wspname){
+      //get the container ID
+
+      //Call kubernetes and start the container
+
+
+    }
+    if(req.body.butt != "create")
+    {
+      //console.log(req.body.)
+      startcontainer(req.body.butt);
+    }
     var addWorkspace=function(db,user,callback){
-      var cursor =db.collection('workspace').insertOne( { "uid": user._id,"workspace":req.body.workspacename},function(err, result) {
+      var cursor =db.collection('workspace').insertOne( { "uid": user._id,"workspace":req.body.workspacename,"description":req.body.descrip},function(err, result) {
       assert.equal(err, null);
       res.redirect('/editor/dashboard');
       res.end();

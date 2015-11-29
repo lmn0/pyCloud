@@ -1,11 +1,23 @@
 header#header
 	div.left
-		a#logo(href="/")
-			img(src="#{staticURL}/images/logo.png")
+		if showlogin
+			a#logo(href="/")
+				img(src="#{staticURL}/images/logo.png")
+		else
+			a#logo(href="/nologin")
+				img(src="#{staticURL}/images/logo.png")
 	div.right
 		nav#topnav
 			ul.noul
-				li
-					a(href="/") Home
-				li
-					a(href="/users/login") Login
+				if showlogin
+					li
+						a(href="/") Home
+					li
+						a(href="/users/login") Login
+				else
+					li
+						a(href="/nologin") Home
+					li
+						a(href="/editor/dashboard") Dashboard
+					li
+						a(href="/users/logout") Logout
