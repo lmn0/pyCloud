@@ -1,7 +1,7 @@
 {
-  "name": "modernjyotisham",
+  "name": "pycloud",
   "version": "0.0.1",
-  "description": "The modern Jyotisham portal",
+  "description": "pyCloud!",
   "main": "index.js",
   "scripts": {
     "prod": "node index.js --prod",
@@ -10,9 +10,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://kamaleshbn@bitbucket.org/kamaleshbn/modernjyotisham.git"
+    "url": "https://github.com/tjskrish/pyCloud.git"
   },
-  "author": "bnkamalesh@gmail.com",
+  "author": "tjskrishna@gmail.com",
   "license": "ISC",
   "private": true,
   "dependencies": {
