@@ -7,7 +7,8 @@ var express = require('express'),
     async = require("async"),
     router = express.Router(),
     Api = require("../../api"),
-    r = require("../../lib/request");
+    r = require("../../lib/request"),
+    request=require("request");
 var mongodb = require('mongodb');
 //We need to work with "MongoClient" interface in order to connect to a mongodb server.
 var MongoClient = mongodb.MongoClient;
@@ -106,20 +107,240 @@ router.post(['/', '/:action'], function(req, res, next) {
   switch(action){
     case "newworkspace":
     console.log(req.body.butt);
-    var startcontainer = function(wspname){
+    
+    if(req.body.butt != "create")
+    {
+      var inp = (req.body.butt).split("+");
+      console.log("------------------------------------")
+      console.log(inp[1]);
+      if(inp[0] == "1"){
+
+        var startcontainer = function(db,userdoc,callback){
       //get the container ID
 
       //Call kubernetes and start the container
-
-
+      var postData={
+          ip:req.ip
+      };
+    request.post({
+    uri:"http://192.168.1.4:3002",
+    headers:{'content-type': 'application/x-www-form-urlencoded'},
+    body:require('querystring').stringify(postData)
+    },function(err,resp,body){
+      if(!err){
+        var jsonObject = JSON.parse(body);
+        console.log(jsonObject);
+        db.collection('workspace').updateOne({ "uid":userdoc._id,"workspace":inp[1]}, { $set: { "running": true ,"conid":(jsonObject.ConID).trim()}} ,function(err, doc) {
+            assert.equal(err, null);
+            if (doc != null) {
+              console.log(doc);
+              //if(doc.status=)
+              //startcontainer(db,doc,function(){db.close();});
+              setTimeout(function() {
+              var loc = jsonObject.Location.trim();
+              res.redirect(""+loc);
+              res.end();
+              }, 5000);
+              
+            } else {
+               console.log(doc);
+              res.redirect("/users/login");
+            }
+        }); 
+        
+           }
+    });
     }
-    if(req.body.butt != "create")
+
+    var resumecontainer = function(db,userdoc,wsdoc,callback){
+      //get the container ID
+
+      //Call kubernetes and start the container
+      var postData={
+          ip:req.ip,
+          cid:wsdoc.conid
+      };
+    request.post({
+    uri:"http://192.168.1.4:3002/resume",
+    headers:{'content-type': 'application/x-www-form-urlencoded'},
+    body:require('querystring').stringify(postData)
+    },function(err,resp,body){
+      if(!err){
+        var jsonObject = JSON.parse(body);
+        console.log(jsonObject);
+        db.collection('workspace').updateOne({ "uid":userdoc._id,"workspace":inp[1]}, { $set: { "running": true }} ,function(err, doc) {
+            assert.equal(err, null);
+            if (doc != null) {
+              //console.log(doc);
+              //if(doc.status=)
+              //startcontainer(db,doc,function(){db.close();});
+              setTimeout(function() {
+              var loc = jsonObject.Location.trim();
+              res.redirect(""+loc);
+              res.end();
+              }, 5000);
+              
+            } else {
+               console.log(doc);
+              res.redirect("/editor/dashboard");
+            }
+        }); 
+        
+           }
+    });
+    }
+      
+  var findWorkspace=function(db,userdoc,callback){
+        var found=0;
+        console.log(userdoc._id);
+        var cursor =db.collection('workspace').findOne({ "uid":userdoc._id,"workspace":inp[1],"running":false},function(err, doc) {
+            assert.equal(err, null);
+            if (doc != null) {
+              console.log(doc);
+              //if(doc.status=)
+              if(doc.conid=="")
+                startcontainer(db,userdoc,function(){db.close();});
+              else
+                resumecontainer(db,userdoc,doc,function(){db.close();});
+
+            } else {
+               console.log(doc);
+              res.redirect("/editor/dashboard");
+            }
+        }); 
+      } 
+
+   var findUser = function(db, callback) {
+          var found=0;
+    console.log(req.sessionID);
+   var cursor =db.collection('users').findOne( { "sid":req.sessionID} ,function(err, doc) {
+      assert.equal(err, null);
+      if (doc != null) {
+        console.log(doc);
+         findWorkspace(db,doc,function(){db.close();});
+      } else {
+        console.log("user not logged in");
+        res.redirect("/users/login");
+        res.end();
+      }
+      //res.redirect('dashboard');
+   });
+   
+};
+
+        MongoClient.connect(url, function (err, db) {
+        if (err) {
+          console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+    //HURRAY!! We are connected. :)
+          console.log('Connection established to', url);
+
+    // Get the documents collection
+    
+          findUser(db,function(){db.close();});
+        
+        }
+      });
+
+  }
+  else if(inp[0] == "2"){
+
+        var stopcontainer = function(db,userdoc,wsdoc,callback){
+      //get the container ID
+
+      //Call kubernetes and start the container
+      var postData={
+          cid:wsdoc.conid
+      };
+    request.post({
+    uri:"http://192.168.1.4:3002/stop",
+    headers:{'content-type': 'application/x-www-form-urlencoded'},
+    body:require('querystring').stringify(postData)
+    },function(err,resp,body){
+      if(!err){
+        var jsonObject = JSON.parse(body);
+        console.log(jsonObject);
+        if(jsonObject.status=="stopped")
+        db.collection('workspace').updateOne({ "uid":userdoc._id,"workspace":inp[1]}, { $set: { "running": false}} ,function(err, doc) {
+            assert.equal(err, null);
+            if (doc != null) {
+              console.log(doc);
+              //if(doc.status=)
+              //startcontainer(db,doc,function(){db.close();});
+              
+                res.redirect('/editor/dashboard');
+                res.end();
+             
+            } else {
+               console.log(doc);
+              res.redirect("/editor/dashboard");
+            }
+        }); 
+        
+           }
+    });
+    }
+      
+  var findWorkspace=function(db,userdoc,callback){
+        var found=0;
+        console.log(userdoc._id);
+        var cursor =db.collection('workspace').findOne({ "uid":userdoc._id,"workspace":inp[1],"running":true},function(err, doc) {
+            assert.equal(err, null);
+            if (doc != null) {
+              console.log(doc);
+              //if(doc.status=)
+              stopcontainer(db,userdoc,doc,function(){db.close();});
+
+
+            } else {
+               console.log(doc);
+              res.redirect("/editor/dashboard");
+            }
+        }); 
+      } 
+
+   var findUser = function(db, callback) {
+          var found=0;
+    console.log(req.sessionID);
+   var cursor =db.collection('users').findOne( { "sid":req.sessionID} ,function(err, doc) {
+      assert.equal(err, null);
+      if (doc != null) {
+        console.log(doc);
+         findWorkspace(db,doc,function(){db.close();});
+      } else {
+        console.log("user not logged in");
+        res.redirect("/users/login");
+        res.end();
+      }
+      //res.redirect('dashboard');
+   });
+   
+};
+
+        MongoClient.connect(url, function (err, db) {
+        if (err) {
+          console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+    //HURRAY!! We are connected. :)
+          console.log('Connection established to', url);
+
+    // Get the documents collection
+    
+          findUser(db,function(){db.close();});
+        
+        }
+      });
+
+  }
+
+
+    }else if(req.body.workspacename=="" || req.body.descrip=="")
     {
-      //console.log(req.body.)
-      startcontainer(req.body.butt);
-    }
+      res.redirect("/editor/dashboard");
+      res.end();
+    }else{
     var addWorkspace=function(db,user,callback){
-      var cursor =db.collection('workspace').insertOne( { "uid": user._id,"workspace":req.body.workspacename,"description":req.body.descrip},function(err, result) {
+      var cursor =db.collection('workspace').insertOne( { "uid": user._id,"workspace":req.body.workspacename,"description":req.body.descrip,"running":false,"conid":""},function(err, result) {
       assert.equal(err, null);
       res.redirect('/editor/dashboard');
       res.end();
@@ -175,7 +396,7 @@ router.post(['/', '/:action'], function(req, res, next) {
          
 
         }
-      });
+      });}
       break;
 
   	case "run":

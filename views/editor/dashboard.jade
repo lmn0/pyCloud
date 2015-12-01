@@ -8,20 +8,26 @@ block main
 						li
 							h3.divider Workspace Dashboard
 							.ui.cards
-								each val in workspaces
+								each val,index in workspaces
 									.card
 										.content
-											.header #{val.workspace}
+											.header(name="wsname" value=val.workspace) #{val.workspace}
 											.description
 											|	#{val.description}
+											br
+											|	#{val.status}
 										.extra.content
 											.ui.two.buttons
-												button(class="ui basic green button" type="submit" name="butt" value=val.workspace) Start
-												button(class="ui basic red button" type="submit" name="butt" value=val.workspace) Delete
+												if val.running
+													button(class="ui basic blue button" type="submit" name="butt" value=("2+"+val.workspace)) Stop
+													button(class="ui basic red button" type="submit" name="butt" value=("3+"+val.workspace)) Delete
+												else
+													button(class="ui basic green button" type="submit" name="butt" formtarget="_blank" value=("1+"+val.workspace)) Start
+													button(class="ui basic red button" type="submit" name="butt" value=("3+"+val.workspace)) Delete
 								.card
 										.content
 											.header 
-												input.input-block-level(name="workspacename", placeholder="Workspace Name") 
+												input.input-block-level(name="workspacename", placeholder="Workspace Name" style="width:250px;") 
 											.description
 												input.input-block-level(name="descrip", placeholder="Description")
 										.ui.one.buttons
