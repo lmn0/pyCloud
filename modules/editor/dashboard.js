@@ -123,7 +123,7 @@ router.post(['/', '/:action'], function(req, res, next) {
           ip:req.ip
       };
     request.post({
-    uri:"http://192.168.1.4:3002",
+    uri:"http://192.168.10.4:3002",
     headers:{'content-type': 'application/x-www-form-urlencoded'},
     body:require('querystring').stringify(postData)
     },function(err,resp,body){
@@ -152,6 +152,7 @@ router.post(['/', '/:action'], function(req, res, next) {
     });
     }
 
+
     var resumecontainer = function(db,userdoc,wsdoc,callback){
       //get the container ID
 
@@ -161,7 +162,7 @@ router.post(['/', '/:action'], function(req, res, next) {
           cid:wsdoc.conid
       };
     request.post({
-    uri:"http://192.168.1.4:3002/resume",
+    uri:"http://192.168.10.4:3002/resume",
     headers:{'content-type': 'application/x-www-form-urlencoded'},
     body:require('querystring').stringify(postData)
     },function(err,resp,body){
@@ -253,7 +254,7 @@ router.post(['/', '/:action'], function(req, res, next) {
           cid:wsdoc.conid
       };
     request.post({
-    uri:"http://192.168.1.4:3002/stop",
+    uri:"http://192.168.10.4:3002/stop",
     headers:{'content-type': 'application/x-www-form-urlencoded'},
     body:require('querystring').stringify(postData)
     },function(err,resp,body){
@@ -290,6 +291,96 @@ router.post(['/', '/:action'], function(req, res, next) {
               console.log(doc);
               //if(doc.status=)
               stopcontainer(db,userdoc,doc,function(){db.close();});
+
+
+            } else {
+               console.log(doc);
+              res.redirect("/editor/dashboard");
+            }
+        }); 
+      } 
+
+   var findUser = function(db, callback) {
+          var found=0;
+    console.log(req.sessionID);
+   var cursor =db.collection('users').findOne({ "sid":req.sessionID} ,function(err, doc) {
+      assert.equal(err, null);
+      if (doc != null) {
+        console.log(doc);
+         findWorkspace(db,doc,function(){db.close();});
+      } else {
+        console.log("user not logged in");
+        res.redirect("/users/login");
+        res.end();
+      }
+      //res.redirect('dashboard');
+   });
+   
+};
+
+        MongoClient.connect(url, function (err, db) {
+        if (err) {
+          console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+    //HURRAY!! We are connected. :)
+          console.log('Connection established to', url);
+
+    // Get the documents collection
+    
+          findUser(db,function(){db.close();});
+        
+        }
+      });
+
+  }
+  else if(inp[0] == "3"){
+
+
+        var deletecontainer = function(db,userdoc,wsdoc,callback){
+      //get the container ID
+
+      //Call kubernetes and start the container
+      var postData={
+          cid:wsdoc.conid
+      };
+    request.post({
+    uri:"http://192.168.10.4:3002/delete",
+    headers:{'content-type': 'application/x-www-form-urlencoded'},
+    body:require('querystring').stringify(postData)
+    },function(err,resp,body){
+      if(!err){
+        var jsonObject = JSON.parse(body);
+        console.log(jsonObject);
+        if(jsonObject.status=="deleted")
+        db.collection('workspace').deleteOne({ "uid":userdoc._id,"workspace":inp[1]},function(err, doc) {
+            assert.equal(err, null);
+            if (doc != null) {
+              //console.log(doc);
+              //if(doc.status=)
+              //startcontainer(db,doc,function(){db.close();});
+              
+                res.redirect('/editor/dashboard');
+                res.end();
+             
+            } else {
+               console.log(doc);
+              res.redirect("/editor/dashboard");
+            }
+        }); 
+        
+           }
+    });
+    }
+      
+  var findWorkspace=function(db,userdoc,callback){
+        var found=0;
+        console.log(userdoc._id);
+        var cursor =db.collection('workspace').findOne({ "uid":userdoc._id,"workspace":inp[1],"running":true},function(err, doc) {
+            assert.equal(err, null);
+            if (doc != null) {
+              console.log(doc);
+              //if(doc.status=)
+              deletecontainer(db,userdoc,doc,function(){db.close();});
 
 
             } else {
