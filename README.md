@@ -28,13 +28,9 @@ $ sudo sdcard/write.sh /dev/sdX rpi-2 archlinux kube-archlinux
 2. Check the IP address in the router admin page
 3. SSH into your Pi [root@ipAddr --> passwd: root]
 
-![Image of IP Table](screenshots/ip_table.png)
-
 
 ### Network Setup
 Use Ethernet cable to connect Raspberry Pis to a router. Reserve static DHCP for your nodes by using the router setting interface.
-
-![Image of Static IP Setting](screenshots/static_ip.png)
 
 
 Verify the IP address (check eht0 int 192… —> reserved?)
