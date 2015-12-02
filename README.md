@@ -4,9 +4,6 @@ pyCloud is a Python as a Service! We use raspberry pi rack to execute the python
 
 
 ## Configuration
-### Network Setup
-Use Ethernet cable to connect Raspberry Pis to a router. Reserve static DHCP for your nodes by using the router setting interface.
-
 ### Raspberry Pi Setup
 #### Prepare SD card
 ```sh
@@ -30,6 +27,15 @@ $ sudo sdcard/write.sh /dev/sdX rpi-2 archlinux kube-archlinux
 1. Power on your Pi
 2. Check the IP address in the router admin page
 3. SSH into your Pi [root@ipAddr --> passwd: root]
+
+![Image of IP Table](docs/ip_table.png)
+
+
+### Network Setup
+Use Ethernet cable to connect Raspberry Pis to a router. Reserve static DHCP for your nodes by using the router setting interface.
+
+![Image of Static IP Setting](sereenshots/static_ip.png)
+
 
 Verify the IP address (check eht0 int 192… —> reserved?)
 ```sh
@@ -157,6 +163,13 @@ http://$MASTER_IP:8080/api/v1/proxy/namespaces/default/services/my-notebook/
 #### Internally
 Use curl to test the request. Request sent from a node belong to the cluster.
 ```sh
-# curl -L -i $INTERNAL_IP:8888
-# curl -L -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d "{}" $INTERNAL_IP:8888/api/notebooks
+
+$ curl -L -i $INTERNAL_IP:8888
+$ curl -L -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d "{}" $INTERNAL_IP:8888/api/notebooks
 ```
+
+## Appendix
+Special Thanks to `Lucas` and his awesome project!
+You can see his helpfulness through our conversation on his GitHub:
+- https://github.com/luxas/kubernetes-on-arm/issues/21
+- https://github.com/luxas/kubernetes-on-arm/issues/22
