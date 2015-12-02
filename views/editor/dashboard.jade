@@ -17,11 +17,13 @@ block main
 											br
 											|	#{val.status}
 										.extra.content
-											.ui.two.buttons
-												if val.running
+											if val.running
+												.ui.three.buttons
+													button(class="ui basic green button" type="submit" name="butt" formtarget="_blank" value=("4+"+val.workspace)) Open
 													button(class="ui basic blue button" type="submit" name="butt" value=("2+"+val.workspace)) Stop
 													button(class="ui basic red button" type="submit" name="butt" value=("3+"+val.workspace)) Delete
-												else
+											else
+												.ui.two.buttons
 													button(class="ui basic green button" type="submit" name="butt" formtarget="_blank" value=("1+"+val.workspace)) Start
 													button(class="ui basic red button" type="submit" name="butt" value=("3+"+val.workspace)) Delete
 								.card

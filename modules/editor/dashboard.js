@@ -17,6 +17,7 @@ var url = 'mongodb://localhost:27017/pyCloud';
 // ===
 var assert = require('assert');
 
+var rpi=[0,0];
 
 //GET Req
 router.get(['/', '/:action'], function(req, res, next) {
@@ -106,7 +107,8 @@ router.post(['/', '/:action'], function(req, res, next) {
 
   switch(action){
     case "newworkspace":
-    console.log(req.body.butt);
+      
+      console.log(req.body.butt);
     
     if(req.body.butt != "create")
     {
@@ -115,7 +117,7 @@ router.post(['/', '/:action'], function(req, res, next) {
       console.log(inp[1]);
       if(inp[0] == "1"){
 
-        var startcontainer = function(db,userdoc,callback){
+        var startcontainer = function(db,rpiurl,userdoc,callback){
       //get the container ID
 
       //Call kubernetes and start the container
@@ -123,7 +125,7 @@ router.post(['/', '/:action'], function(req, res, next) {
           ip:req.ip
       };
     request.post({
-    uri:"http://192.168.10.4:3002",
+    uri:rpiurl,
     headers:{'content-type': 'application/x-www-form-urlencoded'},
     body:require('querystring').stringify(postData)
     },function(err,resp,body){
@@ -152,8 +154,7 @@ router.post(['/', '/:action'], function(req, res, next) {
     });
     }
 
-
-    var resumecontainer = function(db,userdoc,wsdoc,callback){
+    var resumecontainer = function(db,rpiurl,userdoc,wsdoc,callback){
       //get the container ID
 
       //Call kubernetes and start the container
@@ -162,7 +163,7 @@ router.post(['/', '/:action'], function(req, res, next) {
           cid:wsdoc.conid
       };
     request.post({
-    uri:"http://192.168.10.4:3002/resume",
+    uri:rpiurl,
     headers:{'content-type': 'application/x-www-form-urlencoded'},
     body:require('querystring').stringify(postData)
     },function(err,resp,body){
@@ -193,16 +194,27 @@ router.post(['/', '/:action'], function(req, res, next) {
       
   var findWorkspace=function(db,userdoc,callback){
         var found=0;
+        var rpiurl="";
         console.log(userdoc._id);
         var cursor =db.collection('workspace').findOne({ "uid":userdoc._id,"workspace":inp[1],"running":false},function(err, doc) {
             assert.equal(err, null);
             if (doc != null) {
               console.log(doc);
               //if(doc.status=)
-              if(doc.conid=="")
-                startcontainer(db,userdoc,function(){db.close();});
-              else
-                resumecontainer(db,userdoc,doc,function(){db.close();});
+              if(doc.conid==""){
+                if(doc.storedon==1)
+                  rpiurl="http://192.168.10.4:3002/"
+                else
+                  rpiurl="http://192.168.10.102:3002/"
+                startcontainer(db,rpiurl,userdoc,function(){db.close();});
+              }
+              else{
+                if(doc.storedon==1)
+                  rpiurl="http://192.168.10.4:3002/resume"
+                else
+                  rpiurl="http://192.168.10.102:3002/resume"
+                resumecontainer(db,rpiurl,userdoc,doc,function(){db.close();});
+              }
 
             } else {
                console.log(doc);
@@ -246,7 +258,7 @@ router.post(['/', '/:action'], function(req, res, next) {
   }
   else if(inp[0] == "2"){
 
-        var stopcontainer = function(db,userdoc,wsdoc,callback){
+        var stopcontainer = function(db,rpiurl,userdoc,wsdoc,callback){
       //get the container ID
 
       //Call kubernetes and start the container
@@ -254,7 +266,7 @@ router.post(['/', '/:action'], function(req, res, next) {
           cid:wsdoc.conid
       };
     request.post({
-    uri:"http://192.168.10.4:3002/stop",
+    uri:rpiurl,
     headers:{'content-type': 'application/x-www-form-urlencoded'},
     body:require('querystring').stringify(postData)
     },function(err,resp,body){
@@ -284,13 +296,20 @@ router.post(['/', '/:action'], function(req, res, next) {
       
   var findWorkspace=function(db,userdoc,callback){
         var found=0;
+        var rpiurl="";
         console.log(userdoc._id);
         var cursor =db.collection('workspace').findOne({ "uid":userdoc._id,"workspace":inp[1],"running":true},function(err, doc) {
             assert.equal(err, null);
             if (doc != null) {
               console.log(doc);
               //if(doc.status=)
-              stopcontainer(db,userdoc,doc,function(){db.close();});
+
+              if(doc.storedon==1)
+                rpiurl ="http://192.168.10.4:3002/stop"
+              else
+                rpiurl="http://192.168.10.102:3002/stop"
+
+                stopcontainer(db,rpiurl,userdoc,doc,function(){db.close();});
 
 
             } else {
@@ -336,7 +355,7 @@ router.post(['/', '/:action'], function(req, res, next) {
   else if(inp[0] == "3"){
 
 
-        var deletecontainer = function(db,userdoc,wsdoc,callback){
+        var deletecontainer = function(db,rpiurl,userdoc,wsdoc,callback){
       //get the container ID
 
       //Call kubernetes and start the container
@@ -344,7 +363,7 @@ router.post(['/', '/:action'], function(req, res, next) {
           cid:wsdoc.conid
       };
     request.post({
-    uri:"http://192.168.10.4:3002/delete",
+    uri:rpiurl,
     headers:{'content-type': 'application/x-www-form-urlencoded'},
     body:require('querystring').stringify(postData)
     },function(err,resp,body){
@@ -374,13 +393,18 @@ router.post(['/', '/:action'], function(req, res, next) {
       
   var findWorkspace=function(db,userdoc,callback){
         var found=0;
+        var rpiurl="";
         console.log(userdoc._id);
         var cursor =db.collection('workspace').findOne({ "uid":userdoc._id,"workspace":inp[1],"running":true},function(err, doc) {
             assert.equal(err, null);
             if (doc != null) {
               console.log(doc);
               //if(doc.status=)
-              deletecontainer(db,userdoc,doc,function(){db.close();});
+              if(doc.storedon==1)
+                rpiurl ="http://192.168.10.4:3002/delete"
+              else
+                rpiurl="http://192.168.10.102:3002/delete"
+              deletecontainer(db,rpiurl,userdoc,doc,function(){db.close();});
 
 
             } else {
@@ -422,6 +446,98 @@ router.post(['/', '/:action'], function(req, res, next) {
         }
       });
 
+  }else if(inp[0] == "4"){
+    var opencontainer = function(db,rpiurl,userdoc,wsdoc,callback){
+      //get the container ID
+
+      //Call kubernetes and start the container
+      var postData={
+          ip:req.ip,
+          cid:wsdoc.conid
+      };
+    request.post({
+    uri:rpiurl,
+    headers:{'content-type': 'application/x-www-form-urlencoded'},
+    body:require('querystring').stringify(postData)
+    },function(err,resp,body){
+      if(!err){
+        var jsonObject = JSON.parse(body);
+        console.log(jsonObject);
+        db.collection('workspace').updateOne({ "uid":userdoc._id,"workspace":inp[1]}, { $set: { "running": true }} ,function(err, doc) {
+            assert.equal(err, null);
+            if (doc != null) {
+              //console.log(doc);
+              //if(doc.status=)
+              //startcontainer(db,doc,function(){db.close();});
+              setTimeout(function() {
+              var loc = jsonObject.Location.trim();
+              res.redirect(""+loc);
+              res.end();
+              }, 5000);
+              
+            } else {
+               console.log(doc);
+              res.redirect("/editor/dashboard");
+            }
+        }); 
+        
+           }
+    });
+    }
+      
+  var findWorkspace=function(db,userdoc,callback){
+        var found=0;
+        var rpiurl="";
+        console.log(userdoc._id);
+        var cursor =db.collection('workspace').findOne({ "uid":userdoc._id,"workspace":inp[1],"running":true},function(err, doc) {
+            assert.equal(err, null);
+            if (doc != null) {
+              console.log(doc);
+              //if(doc.status=)
+              
+                if(doc.storedon==1)
+                  rpiurl="http://192.168.10.4:3002/open"
+                else
+                  rpiurl="http://192.168.10.102:3002/open"
+                opencontainer(db,rpiurl,userdoc,doc,function(){db.close();});
+            } else {
+               console.log(doc);
+              res.redirect("/editor/dashboard");
+            }
+        }); 
+      } 
+
+   var findUser = function(db, callback) {
+          var found=0;
+    console.log(req.sessionID);
+   var cursor =db.collection('users').findOne( { "sid":req.sessionID} ,function(err, doc) {
+      assert.equal(err, null);
+      if (doc != null) {
+        console.log(doc);
+         findWorkspace(db,doc,function(){db.close();});
+      } else {
+        console.log("user not logged in");
+        res.redirect("/users/login");
+        res.end();
+      }
+      //res.redirect('dashboard');
+   });
+   
+};
+
+        MongoClient.connect(url, function (err, db) {
+        if (err) {
+          console.log('Unable to connect to the mongoDB server. Error:', err);
+        } else {
+    //HURRAY!! We are connected. :)
+          console.log('Connection established to', url);
+
+    // Get the documents collection
+    
+          findUser(db,function(){db.close();});
+        
+        }
+      });
   }
 
 
@@ -431,7 +547,13 @@ router.post(['/', '/:action'], function(req, res, next) {
       res.end();
     }else{
     var addWorkspace=function(db,user,callback){
-      var cursor =db.collection('workspace').insertOne( { "uid": user._id,"workspace":req.body.workspacename,"description":req.body.descrip,"running":false,"conid":""},function(err, result) {
+      var storedon = 0;
+      if(rpi[0]<=rpi[1]){
+        storedon=1;rpi[0]=rpi[0]+1;}
+      else{
+        storedon=2;rpi[1]=rpi[1]+1;}
+
+      var cursor =db.collection('workspace').insertOne( { "uid": user._id,"workspace":req.body.workspacename,"description":req.body.descrip,"running":false,"conid":"","storedon":storedon},function(err, result) {
       assert.equal(err, null);
       res.redirect('/editor/dashboard');
       res.end();
@@ -483,11 +605,10 @@ router.post(['/', '/:action'], function(req, res, next) {
     // Get the documents collection
     
           findUser(db,function(){db.close();});
-        
-         
 
         }
       });}
+
       break;
 
   	case "run":

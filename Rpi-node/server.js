@@ -46,6 +46,23 @@ exec("sudo docker start "+req.body.cid, putCID);
 });
 
 
+app.post('/open',urlencodedParser,function(req,res){
+
+if(!req.body)return res.sendStatus(400);
+var uport;
+console.log(req.body.ip);
+function putIP(error, stdout, stderr) {sys.puts(stdout);ip=stdout; ip=ip.trim();uport=port;exec("iptables -t nat -A DOCKER -p tcp -s "+req.body.ip+" --dport "+port+" -j DNAT --to-destination "+ip+":8888",puts);port=port+1;sys.puts("iptables -t nat -A DOCKER -p tcp -s "+req.body.ip+" --dport "+port+" -j DNAT --to-destination "+ip+":8888");}
+
+function puts(error, stdout, stderr) {sys.puts(stdout);
+        res.write(JSON.stringify( {Location: 'http://192.168.10.102:'+uport,ConID:cid} ///This string should be sent to the Host server (my lappy)
+));
+res.end();}
+
+exec("docker inspect -f '{{ .NetworkSettings.IPAddress }}' "+req.body.cid,putIP);
+
+});
+
+
 app.post('/stop',urlencodedParser,function(req,res){
 if(!req.body)return res.sendStatus(400);
 
