@@ -157,6 +157,6 @@ http://$MASTER_IP:8080/api/v1/proxy/namespaces/default/services/my-notebook/
 #### Internally
 Use curl to test the request. Request sent from a node belong to the cluster.
 ```sh
-# curl -L -i $INTERNAL_IP:8888
-# curl -L -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d "{}" $INTERNAL_IP:8888/api/notebooks
+$ curl -L -i $INTERNAL_IP:8888
+$ curl -L -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d "{}" $INTERNAL_IP:8888/api/notebooks
 ```
