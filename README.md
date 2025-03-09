@@ -1,6 +1,6 @@
-What is pycloud!
+What is pycloud?
 
-pyCloud is a Python as a Service! We use raspberry pi rack to execute the python programs that are written by the users.
+pyCloud is a Python IDE as a Service! The service is a cloud system where users can run python programs in a remote server without having to install any packages locally on their system. We use a rack of 4 Raspberry PIs to run the Python programs in a distributed manner as Docker containers. The intricacies of this system is in routing network to the respective containers. The load balanced traffic goes to the container based on the IP table routes that are set when a container is deployed. Kubernetes redundancies make the service available at any time without downtime. 
 
 
 ## Configuration
